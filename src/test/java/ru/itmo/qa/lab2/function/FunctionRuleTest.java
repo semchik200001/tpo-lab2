@@ -57,6 +57,7 @@ class FunctionRuleTest {
 
   private static Stream<Arguments> functions() {
     return Stream.of(
+      Arguments.of(new Sine()),
       Arguments.of(new Cosine()),
       Arguments.of(new Secant()),
       Arguments.of(new Cosecant()),
