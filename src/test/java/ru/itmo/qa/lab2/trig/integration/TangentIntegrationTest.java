@@ -62,7 +62,7 @@ class TangentIntegrationTest {
   @Test
   @DisplayName("Tangent throws exception when cos(x) = 0")
   void shouldThrowWhenSineIsZero() {
-    BigDecimal x = BigDecimal.valueOf(Math.PI).divide(BigDecimal.TWO); // cos(π/2) = 0
+    BigDecimal x = BigDecimal.valueOf(Math.PI).divide(BigDecimal.valueOf(2)); // cos(π/2) = 0
     when(mockSin.calculate(eq(x), any())).thenReturn(BigDecimal.ONE);
     when(mockCos.calculate(eq(x), any())).thenReturn(BigDecimal.ZERO);
 

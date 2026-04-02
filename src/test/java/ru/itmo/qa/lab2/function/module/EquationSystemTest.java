@@ -48,9 +48,8 @@ class EquationSystemTest {
 
   @ParameterizedTest
   @MethodSource("illegalValuesLt0")
-  void shouldNotAcceptIncorrectValuesForLt0(final BigDecimal precision) {
-    BigDecimal arg = new BigDecimal(-2);
-    assertThrows(ArithmeticException.class, () -> system.calculate(arg, precision));
+  void shouldNotAcceptIncorrectValuesForLt0(final BigDecimal x) {
+    assertThrows(ArithmeticException.class, () -> system.calculate(x, DEFAULT_PRECISION));
   }
 
   @ParameterizedTest
@@ -63,7 +62,7 @@ class EquationSystemTest {
   @Test
   void shouldCalculateForGt0() {
     BigDecimal arg = BigDecimal.valueOf(1000);
-    assertEquals(BigDecimal.valueOf(3.9539834), system.calculate(arg, DEFAULT_PRECISION));
+    assertEquals(new BigDecimal("7094.9719199"), system.calculate(arg, DEFAULT_PRECISION));
   }
 
   @Test
@@ -73,7 +72,6 @@ class EquationSystemTest {
     assertEquals(msg, exception.getMessage());
   }
 
-  // FIXME
   @ParameterizedTest(name = "f({0}) = {1}")
   @CsvFileSource(resources = "/system.csv", numLinesToSkip = 1, delimiter = ',')
   void testSystem(BigDecimal x, BigDecimal y) {
@@ -91,11 +89,16 @@ class EquationSystemTest {
 
   private static Stream<Arguments> illegalValuesLt0() {
     return Stream.of(
-      Arguments.of(BigDecimal.valueOf(0)),
-      Arguments.of(BigDecimal.valueOf(-Math.PI).divide(BigDecimal.valueOf(2), 10, RoundingMode.HALF_EVEN)),
-      Arguments.of(BigDecimal.valueOf(-Math.PI)),
-      Arguments.of(BigDecimal.valueOf(-Math.PI).multiply(BigDecimal.valueOf(3)).divide(BigDecimal.valueOf(2), 10, RoundingMode.HALF_EVEN)),
-      Arguments.of(BigDecimal.valueOf(-Math.PI).multiply(BigDecimal.valueOf(2)))
+      // x = 0: cot undefined (sin(0)=0)
+      Arguments.of(BigDecimal.ZERO),
+      // x = -π/2: cos=0 → sec, cot/cos, tan undefined
+      Arguments.of(BigDecimal.valueOf(-Math.PI / 2).setScale(10, RoundingMode.HALF_EVEN)),
+      // x = -π: sin=0 → cot, cot/cos undefined
+      Arguments.of(BigDecimal.valueOf(-Math.PI).setScale(10, RoundingMode.HALF_EVEN)),
+      // x = -3π/2: cos=0 → sec, cot/cos, tan undefined
+      Arguments.of(BigDecimal.valueOf(-3 * Math.PI / 2).setScale(10, RoundingMode.HALF_EVEN)),
+      // x = -2π: sin=0 → cot undefined
+      Arguments.of(BigDecimal.valueOf(-2 * Math.PI).setScale(10, RoundingMode.HALF_EVEN))
     );
   }
 }

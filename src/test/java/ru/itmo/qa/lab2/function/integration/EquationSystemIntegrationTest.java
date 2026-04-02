@@ -32,15 +32,13 @@ class EquationSystemIntegrationTest {
   @Spy
   private Secant spySec;
   @Spy
-  private Cosecant spyCsc;
-  @Spy
   private Tangent spyTan;
+  @Spy
+  private Cotangent spyCot;
   @Spy
   private NaturalLogarithm spyLn;
   @Spy
   private BaseNLogarithm spyLog2;
-  @Spy
-  private BaseNLogarithm spyLog3;
   @Spy
   private BaseNLogarithm spyLg;
 
@@ -51,46 +49,42 @@ class EquationSystemIntegrationTest {
   @Mock
   private Secant mockSec;
   @Mock
-  private Cosecant mockCsc;
-  @Mock
   private Tangent mockTan;
+  @Mock
+  private Cotangent mockCot;
   @Mock
   private NaturalLogarithm mockLn;
   @Mock
   private BaseNLogarithm mockLog2;
   @Mock
-  private BaseNLogarithm mockLog3;
-  @Mock
   private BaseNLogarithm mockLg;
 
   @Test
   void shouldCallAllTrigFunctions() {
-    EquationSystem system = new EquationSystem(spySin, spyCos, spySec, spyCsc, spyTan, spyLn, spyLog2, spyLog3, spyLg);
+    EquationSystem system = new EquationSystem(spySin, spyCos, spySec, spyTan, spyCot, spyLn, spyLog2, spyLg);
     system.calculate(new BigDecimal(-5), new BigDecimal("0.0001"));
     verify(spySin, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
     verify(spyCos, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
     verify(spySec, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
-    verify(spyCsc, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
     verify(spyTan, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
+    verify(spyCot, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
     verifyNoInteractions(spyLn);
     verifyNoInteractions(spyLog2);
-    verifyNoInteractions(spyLog3);
     verifyNoInteractions(spyLg);
   }
 
   @Test
   void shouldCallAllLogFunctions() {
-    EquationSystem system = new EquationSystem(spySin, spyCos, spySec, spyCsc, spyTan, spyLn, spyLog2, spyLog3, spyLg);
+    EquationSystem system = new EquationSystem(spySin, spyCos, spySec, spyTan, spyCot, spyLn, spyLog2, spyLg);
     system.calculate(new BigDecimal(5), new BigDecimal("0.0001"));
     verify(spyLn, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
     verify(spyLog2, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
-    verify(spyLog3, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
     verify(spyLg, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
     verifyNoInteractions(spySin);
     verifyNoInteractions(spyCos);
     verifyNoInteractions(spySec);
-    verifyNoInteractions(spyCsc);
     verifyNoInteractions(spyTan);
+    verifyNoInteractions(spyCot);
   }
 
   @ParameterizedTest(name = "f({0}) = {1}")
@@ -101,19 +95,18 @@ class EquationSystemIntegrationTest {
       when(mockLn.calculate(eq(x), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(Math.log(x.doubleValue())));
       when(mockLog2.calculate(eq(x), any(BigDecimal.class)))
           .thenReturn(BigDecimal.valueOf(Math.log(x.doubleValue()) / Math.log(2)));
-      when(mockLog3.calculate(eq(x), any(BigDecimal.class)))
-          .thenReturn(BigDecimal.valueOf(Math.log(x.doubleValue()) / Math.log(3)));
       when(mockLg.calculate(eq(x), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(Math.log10(x.doubleValue())));
     } else {
-      when(mockSin.calculate(eq(x), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(Math.sin(x.doubleValue())));
-      when(mockCos.calculate(eq(x), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(Math.cos(x.doubleValue())));
+      double xd = x.doubleValue();
+      when(mockSin.calculate(eq(x), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(Math.sin(xd)));
+      when(mockCos.calculate(eq(x), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(Math.cos(xd)));
       when(mockSec.calculate(eq(x), any(BigDecimal.class)))
-          .thenReturn(BigDecimal.valueOf(1 / Math.cos(x.doubleValue())));
-      when(mockCsc.calculate(eq(x), any(BigDecimal.class)))
-          .thenReturn(BigDecimal.valueOf(1 / Math.sin(x.doubleValue())));
-      when(mockTan.calculate(eq(x), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(Math.tan(x.doubleValue())));
+          .thenReturn(BigDecimal.valueOf(1.0 / Math.cos(xd)));
+      when(mockTan.calculate(eq(x), any(BigDecimal.class))).thenReturn(BigDecimal.valueOf(Math.tan(xd)));
+      when(mockCot.calculate(eq(x), any(BigDecimal.class)))
+          .thenReturn(BigDecimal.valueOf(Math.cos(xd) / Math.sin(xd)));
     }
-    EquationSystem system = new EquationSystem(mockSin, mockCos, mockSec, mockCsc, mockTan, mockLn, mockLog2, mockLog3, mockLg);
+    EquationSystem system = new EquationSystem(mockSin, mockCos, mockSec, mockTan, mockCot, mockLn, mockLog2, mockLg);
     assertEquals(y, system.calculate(x, PRECISION));
   }
 }
