@@ -20,17 +20,27 @@ import static java.math.BigDecimal.ONE;
 import static java.math.RoundingMode.HALF_EVEN;
 
 /**
+ * Вариант 46879.
  *
- * Схема в виде таблицы зависимостей:
+ * Базовые функции:
+ *  - sin(x) — ряд Тейлора
+ *  - ln(x)  — ряд для arctanh ((z-1)/(z+1))
  *
- * | Класс | Зависимости | Формула |
- * |-----------|---------------|---------------|
- * | Sine | — | Ряд Тейлора |
- * | Cosine | Sine | sin(π/2 - x) |
- * | Cosecant | Sine | 1/sin(x) |
- * | Secant | Cosine | 1/cos(x) |
- * | Tangent | Sine + Cosine | sin(x)/cos(x) |
- * | Cotangent | Sine + Cosine | cos(x)/sin(x) |
+ * Зависимости:
+ * | Класс            | Зависимости      | Формула              |
+ * |------------------|------------------|----------------------|
+ * | Sine             | —                | Ряд Тейлора          |
+ * | Cosine           | Sine             | sin(π/2 - x)         |
+ * | Cosecant         | Sine             | 1/sin(x)             |
+ * | Secant           | Cosine           | 1/cos(x)             |
+ * | Tangent          | Sine + Cosine    | sin(x)/cos(x)        |
+ * | Cotangent        | Sine + Cosine    | cos(x)/sin(x)        |
+ * | NaturalLogarithm | —                | Ряд                  |
+ * | BaseNLogarithm   | NaturalLogarithm | ln(x)/ln(base)       |
+ *
+ * Система функций варианта 46879:
+ *  x ≤ 0 : (((cos(x) + cos(x)) * sec(x)^3) + cos(x))
+ *  x > 0 : ((((log_2(x) * log_5(x) / log_2(x)) * log_2(x))^2) + (log_2(x) / log_10(x)))
  */
 public class Main {
 

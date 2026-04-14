@@ -15,7 +15,7 @@ public class Cotangent extends AbstractFunction {
   public Cotangent() {
     super();
     this.sine = new Sine();
-    this.cosine = new Cosine();
+    this.cosine = new Cosine(this.sine);
   }
 
   public Cotangent(Sine sine, Cosine cosine) {

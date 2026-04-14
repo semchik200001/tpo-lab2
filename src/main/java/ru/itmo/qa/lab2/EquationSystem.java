@@ -3,8 +3,9 @@ package ru.itmo.qa.lab2;
 import lombok.AllArgsConstructor;
 import ru.itmo.qa.lab2.function.AbstractFunction;
 import ru.itmo.qa.lab2.log.BaseNLogarithm;
-import ru.itmo.qa.lab2.log.NaturalLogarithm;
-import ru.itmo.qa.lab2.trig.*;
+import ru.itmo.qa.lab2.trig.Cosine;
+import ru.itmo.qa.lab2.trig.Secant;
+import ru.itmo.qa.lab2.trig.Sine;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -14,84 +15,69 @@ import static java.math.BigDecimal.ZERO;
 import static java.math.MathContext.DECIMAL128;
 import static java.math.RoundingMode.HALF_EVEN;
 
+/**
+ * Вариант 46879.
+ *
+ *  x ≤ 0 : (((cos(x) + cos(x)) * sec(x)^3) + cos(x))
+ *  x > 0 : ((((log_2(x) * log_5(x) / log_2(x)) * log_2(x))^2) + (log_2(x) / log_10(x)))
+ */
 @AllArgsConstructor
 public class EquationSystem extends AbstractFunction {
-  private final Sine sin;
   private final Cosine cos;
   private final Secant sec;
-  private final Tangent tan;
-  private final Cotangent cot;
 
-  private final NaturalLogarithm ln;
   private final BaseNLogarithm log2;
+  private final BaseNLogarithm log5;
   private final BaseNLogarithm lg;
 
   public EquationSystem() {
     super();
-    sin = new Sine();
-    cos = new Cosine();
-    sec = new Secant();
-    tan = new Tangent();
-    cot = new Cotangent();
+    Sine sin = new Sine();
+    cos = new Cosine(sin);
+    sec = new Secant(cos);
 
-    ln = new NaturalLogarithm();
     log2 = new BaseNLogarithm(2);
+    log5 = new BaseNLogarithm(5);
     lg = new BaseNLogarithm(10);
   }
 
   @Override
   public BigDecimal calculate(BigDecimal x, BigDecimal precision) {
+    isValid(x, precision);
     final MathContext mc = new MathContext(DECIMAL128.getPrecision(), HALF_EVEN);
     final BigDecimal p = precision.setScale(precision.scale() + 10, HALF_EVEN);
 
     if (x.compareTo(ZERO) <= 0) {
-      // x <= 0 : ((((cot(x)/cos(x)) * cot(x))^2) - ((sec(x) + sec(x)) * (sin(x)/tan(x)))) + cot(x)^2
-      // Note: sin(x)/tan(x) = cos(x)
       try {
-        BigDecimal sinX = c(sin, x, p);
-        BigDecimal cotX = c(cot, x, p);
         BigDecimal cosX = c(cos, x, p);
         BigDecimal secX = c(sec, x, p);
-        BigDecimal tanX = c(tan, x, p);
 
-        // (cot(x)/cos(x)) * cot(x)
-        BigDecimal inner = cotX.divide(cosX, mc.getPrecision(), HALF_EVEN).multiply(cotX, mc);
-        // inner^2
-        BigDecimal term1 = inner.pow(2, mc);
-        // sin(x)/tan(x)  — вычисляем напрямую, без упрощений
-        BigDecimal sinOverTan = sinX.divide(tanX, mc.getPrecision(), HALF_EVEN);
-        BigDecimal term2 = secX.add(secX, mc).multiply(sinOverTan, mc);
-        // cot(x)^2
-        BigDecimal term3 = cotX.pow(2, mc);
-
-        return term1.subtract(term2, mc).add(term3, mc).setScale(precision.scale(), HALF_EVEN);
+        BigDecimal sumCos = cosX.add(cosX, mc);
+        BigDecimal secCubed = secX.pow(3, mc);
+        BigDecimal product = sumCos.multiply(secCubed, mc);
+        return product.add(cosX, mc).setScale(precision.scale(), HALF_EVEN);
       } catch (ArithmeticException e) {
         throw new ArithmeticException(format("У функции нет значения при x = %s", x));
       }
+    }
 
-    } else {
-      // x > 0 : ((((log_10(x) + log_2(x))^3) * log_2(x)) / log_10(x)) + ln(x)
-      try {
-        BigDecimal log10x = c(lg, x, p);
-        BigDecimal log2x = c(log2, x, p);
-        BigDecimal lnx = c(ln, x, p);
+    try {
+      BigDecimal log2x = c(log2, x, p);
+      BigDecimal log5x = c(log5, x, p);
+      BigDecimal log10x = c(lg, x, p);
 
-        if (log10x.abs().compareTo(p) < 0) {
-          throw new ArithmeticException(format("У функции нет значения при x = %s", x));
-        }
-
-        // (log_10(x) + log_2(x))^3
-        BigDecimal sumLogs = log10x.add(log2x, mc);
-        BigDecimal sumCubed = sumLogs.pow(3, mc);
-        // * log_2(x)
-        BigDecimal numerator = sumCubed.multiply(log2x, mc);
-        // / log_10(x)
-        BigDecimal divided = numerator.divide(log10x, mc.getPrecision(), HALF_EVEN);
-        // + ln(x)
-        return divided.add(lnx, mc).setScale(precision.scale(), HALF_EVEN);
-      } catch (ArithmeticException e) {
+      if (log10x.abs().compareTo(p) < 0) {
         throw new ArithmeticException(format("У функции нет значения при x = %s", x));
       }
+
+      BigDecimal numInner = log2x.multiply(log5x, mc);
+      BigDecimal divInner = numInner.divide(log2x, mc.getPrecision(), HALF_EVEN);
+      BigDecimal mulLog2 = divInner.multiply(log2x, mc);
+      BigDecimal squared = mulLog2.pow(2, mc);
+      BigDecimal ratio = log2x.divide(log10x, mc.getPrecision(), HALF_EVEN);
+      return squared.add(ratio, mc).setScale(precision.scale(), HALF_EVEN);
+    } catch (ArithmeticException e) {
+      throw new ArithmeticException(format("У функции нет значения при x = %s", x));
     }
   }
 

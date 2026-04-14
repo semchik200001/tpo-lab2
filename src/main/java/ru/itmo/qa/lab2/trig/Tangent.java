@@ -15,7 +15,7 @@ public class Tangent extends AbstractFunction {
   public Tangent() {
     super();
     this.sine = new Sine();
-    this.cosine = new Cosine();
+    this.cosine = new Cosine(this.sine);
   }
 
   public Tangent(Sine sine, Cosine cosine) {

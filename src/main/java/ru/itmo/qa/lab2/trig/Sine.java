@@ -39,7 +39,7 @@ public class Sine extends AbstractFunction {
           .divide(BigDecimal.valueOf((2L * i) * (2L * i + 1)), mc);
       result = result.add(term.multiply(minusOnePower(i)), mc);
       i++;
-    } while (term.abs().compareTo(precision.divide(BigDecimal.TEN, mc)) > 0);
+    } while (term.abs().compareTo(precision.divide(BigDecimal.TEN, mc)) > 0 && i < getSeriesLength());
 
     return result.setScale(precision.scale(), RoundingMode.HALF_EVEN);
   }
