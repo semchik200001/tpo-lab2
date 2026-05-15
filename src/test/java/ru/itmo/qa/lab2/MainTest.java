@@ -35,7 +35,8 @@ public class MainTest {
     String[] expectedFiles = {
         "Sine.csv", "Cosine.csv", "Secant.csv", "Cosecant.csv",
         "Tangent.csv", "Cotangent.csv", "NaturalLogarithm.csv",
-        "BaseNLogarithm.csv", "EquationSystem.csv"
+        "BaseNLogarithm_2.csv", "BaseNLogarithm_3.csv", "BaseNLogarithm_10.csv",
+        "BaseNLogarithm_12.csv", "EquationSystem.csv"
     };
 
     for (String filename : expectedFiles) {

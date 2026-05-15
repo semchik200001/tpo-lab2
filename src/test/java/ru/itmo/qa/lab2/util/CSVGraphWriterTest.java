@@ -32,20 +32,22 @@ class CSVGraphWriterTest {
 
   @Test
   void shouldCreateFile() {
+    when(mockFunction.getFileName()).thenReturn("MockFunction");
     writer = new CSVGraphWriter(mockFunction, DEFAULT_DIR);
-    File expectedFile = new File(DEFAULT_DIR + mockFunction.getClass().getSimpleName() + ".csv");
+    File expectedFile = new File(DEFAULT_DIR + "MockFunction.csv");
 
     assertTrue(expectedFile.exists(), "Файл должен быть создан");
   }
 
   @Test
   void shouldWriteToFile() throws IOException {
+    when(mockFunction.getFileName()).thenReturn("MockFunction");
     when(mockFunction.calculate(any(), any())).thenReturn(ONE);
 
     writer = new CSVGraphWriter(mockFunction, DEFAULT_DIR);
     writer.write(ZERO, TEN, ONE, BigDecimal.valueOf(0.01));
 
-    File file = new File(DEFAULT_DIR + mockFunction.getClass().getSimpleName() + ".csv");
+    File file = new File(DEFAULT_DIR + "MockFunction.csv");
     List<String> lines = Files.readAllLines(file.toPath());
 
     assertEquals("x,y", lines.get(0));
@@ -54,12 +56,13 @@ class CSVGraphWriterTest {
 
   @Test
   void shouldHandleArithmeticException() throws IOException {
+    when(mockFunction.getFileName()).thenReturn("MockFunction");
     when(mockFunction.calculate(any(), any())).thenThrow(new ArithmeticException("Разрыв"));
 
     writer = new CSVGraphWriter(mockFunction, DEFAULT_DIR);
     writer.write(BigDecimal.ZERO, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.valueOf(0.01));
 
-    File file = new File(DEFAULT_DIR + mockFunction.getClass().getSimpleName() + ".csv");
+    File file = new File(DEFAULT_DIR + "MockFunction.csv");
     List<String> lines = Files.readAllLines(file.toPath());
 
     assertTrue(lines.get(1).isEmpty(), "Должна быть пустая строка при разрыве");
@@ -83,7 +86,7 @@ class CSVGraphWriterTest {
     writer = null;
     File file = new File(
         System.getProperty("user.dir") + File.separator + "plots" + File.separator
-            + mockFunction.getClass().getSimpleName() + ".csv");
+            + "MockFunction.csv");
     if (!(file.delete())) {
       System.out.println("Файл удален.");
     } else {
