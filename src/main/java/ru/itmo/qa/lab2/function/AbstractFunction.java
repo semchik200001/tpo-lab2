@@ -15,6 +15,10 @@ public abstract class AbstractFunction implements FunctionRule {
     this.seriesLength = MAX_ITERATIONS;
   }
 
+  public String getFileName() {
+    return getClass().getSimpleName();
+  }
+
   protected void isValid(final BigDecimal x, final BigDecimal precision) {
     Objects.requireNonNull(x, "Аргумент не должен быть null");
     Objects.requireNonNull(precision, "Точность не должна быть null");

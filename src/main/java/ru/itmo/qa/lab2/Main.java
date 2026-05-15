@@ -77,6 +77,7 @@ public class Main {
     new CSVGraphWriter(new BaseNLogarithm(3), outputDir).write(NEGATIVE_END, POSITIVE_END, STEP, PRECISION);
     new CSVGraphWriter(new BaseNLogarithm(10), outputDir).write(NEGATIVE_END, POSITIVE_END, STEP, PRECISION);
     new CSVGraphWriter(new EquationSystem(), outputDir).write(NEGATIVE_END, POSITIVE_END, STEP, PRECISION);
+    new CSVGraphWriter(new BaseNLogarithm(12), outputDir).write(new BigDecimal(-1), new BigDecimal(13), STEP, PRECISION);
   }
 
   private static void displayAllPlots() {
@@ -99,13 +100,12 @@ public class Main {
     List<String> trimFunctions = List.of("tan(x)", "cot(x)", "sec(x)", "csc(x)", "f(x)");
 
     for (Map.Entry<AbstractFunction, String> entry : functionMap.entrySet()) {
-      CSVGraphWriter writer = new CSVGraphWriter(entry.getKey(), outputDir);
-      writer.write(NEGATIVE_END, POSITIVE_END, STEP, PRECISION);
+      String filePath = outputDir + entry.getKey().getFileName() + ".csv";
 
       FunctionGraph graph = new FunctionGraph(
           "График функции: " + entry.getValue(),
           entry.getValue(),
-          writer.getFilePath(),
+          filePath,
           trimFunctions.contains(entry.getValue())
       );
 

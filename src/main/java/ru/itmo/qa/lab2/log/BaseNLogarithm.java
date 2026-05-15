@@ -30,6 +30,15 @@ public class BaseNLogarithm extends AbstractFunction {
     this.base = base;
   }
 
+  public int getBase() {
+    return base;
+  }
+
+  @Override
+  public String getFileName() {
+    return getClass().getSimpleName() + "_" + base;
+  }
+
   @Override
   public BigDecimal calculate(BigDecimal x, BigDecimal precision) throws ArithmeticException {
     isValid(x, precision);

@@ -32,7 +32,7 @@ public class CSVGraphWriter {
   }
 
   private String getFilePath(String outputDir, AbstractFunction function) {
-    return outputDir + function.getClass().getSimpleName() + ".csv";
+    return outputDir + function.getFileName() + ".csv";
   }
 
   @SneakyThrows(IOException.class)
