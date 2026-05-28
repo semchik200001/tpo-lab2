@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,12 +39,14 @@ class CotangentIntegrationTest {
   private Cosine spyCos;
 
   @Test
-  @DisplayName("Test 1: Call both sine and cosine")
+  @DisplayName("Test 1: Call sine and cosine in order")
   void shouldCallSineAndCosineFunction() {
     Cotangent cot = new Cotangent(spySin, spyCos);
     cot.calculate(new BigDecimal(979), PRECISION);
-    verify(spySin, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
-    verify(spyCos, atLeastOnce()).calculate(any(BigDecimal.class), any(BigDecimal.class));
+
+    InOrder order = inOrder(spySin, spyCos);
+    order.verify(spySin).calculate(any(BigDecimal.class), any(BigDecimal.class));
+    order.verify(spyCos).calculate(any(BigDecimal.class), any(BigDecimal.class));
   }
 
   @ParameterizedTest(name = "mock.cot({0}) = {1}")
